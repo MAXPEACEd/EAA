@@ -1,0 +1,34 @@
+# ignore big stuff
+datasets/
+ckpt/
+checkpoints/
+models/
+envs/
+cache/
+*.pt
+*.pth
+*.ckpt
+*.tar.gz
+*.zip
+*.wav
+*.mp3
+*.onnx
+
+# training logs
+logs/
+wandb/
+
+# python cache
+__pycache__/
+*.pyc
+
+# checkpoints
+ckpt/
+checkpoints/
+*.pt
+*.pth
+
+# env
+envs/
+.conda/
+
