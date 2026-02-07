@@ -15,23 +15,23 @@ import multiprocessing as mp
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 CUDA_VISIBLE_DEVICES = 0
 
-# 设置日志配置
+# Logging configuration
 logging.basicConfig(
-    level=logging.INFO,  # 设置日志级别为 INFO
+    level=logging.INFO,  # Set log level to INFO
     format="%(asctime)s - %(levelname)s - %(message)s",
     handlers=[
-        logging.FileHandler("training3.log"),  # 日志输出到文件
-        logging.StreamHandler()               # 日志输出到终端
+        logging.FileHandler("training3.log"),  # Log to file
+        logging.StreamHandler()               # Log to stdout
     ]
 )
 
-# 设置随机种子
+# Set random seed
 seed = 42
-torch.manual_seed(seed)            # CPU 随机数种子
-torch.cuda.manual_seed(seed)       # GPU 随机数种子
-torch.cuda.manual_seed_all(seed)   # 多 GPU 随机数种子
-random.seed(seed)                  # Python 的随机数种子
-# np.random.seed(seed)               # NumPy 随机数种子
+torch.manual_seed(seed)            # CPU RNG seed
+torch.cuda.manual_seed(seed)       # GPU RNG seed
+torch.cuda.manual_seed_all(seed)   # Multi-GPU RNG seed
+random.seed(seed)                  # Python RNG seed
+# np.random.seed(seed)               # NumPy RNG seed
 
 
 # -------------------- Argument Parser --------------------
@@ -139,7 +139,7 @@ def warmup_lr_schedule(step, optimizer, max_step, init_lr, max_lr):
 
 def cosine_lr_schedule(epoch, optimizer, max_epoch, init_lr, min_lr):
     epoch = torch.tensor(float(epoch), dtype=torch.float32)
-    max_epoch = torch.tensor(float(max_epoch), dtype=torch.float32)  # 确保是 Tensor
+    max_epoch = torch.tensor(float(max_epoch), dtype=torch.float32)  # Ensure Tensor
     lr = min_lr + 0.5 * (init_lr - min_lr) * (1 + torch.cos(torch.pi * epoch / max_epoch))
 
     for param_group in optimizer.param_groups:
@@ -175,22 +175,22 @@ def train(model, train_loader, val_loader, optimizer, scheduler, device, args):
 
             # Accumulate loss
             # total_loss += outputs["loss"].item()
-            total_loss += loss.item()  # 记录最终混合损失
+            total_loss += loss.item()  # Track the final mixed loss
 
             # Backward pass
             scaler.scale(loss).backward()
 
             if (batch_idx + 1) % args.accum_grad_iters == 0 or (batch_idx + 1) == len(train_loader):
-                # 先解除缩放，恢复真实梯度
+                # Unscale first to get real gradients
                 scaler.unscale_(optimizer)
 
-                # 进行梯度裁剪，防止梯度爆炸
+                # Clip gradients to avoid explosion
                 torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)
 
-                # 进行优化器更新
+                # Update optimizer
                 scaler.step(optimizer)
                 scaler.update()
-                optimizer.zero_grad()  # 清空梯度，防止影响下一次更新
+                optimizer.zero_grad()  # Clear gradients for next step
                 scheduler.step(epoch, batch_idx)
 
             # Update metrics
@@ -231,8 +231,8 @@ def train(model, train_loader, val_loader, optimizer, scheduler, device, args):
 def evaluate_generation_token(model, val_loader, device):
     model.eval()
     total_loss, total_correct, total_samples = 0.0, 0, 0
-    total_gen_correct = 0  # 用于统计生成的类别正确数量
-    total_gen_samples = 0  # 用于统计生成的样本数量
+    total_gen_correct = 0  # Count correct generated labels
+    total_gen_samples = 0  # Count generated samples
 
     results = []
 
@@ -251,8 +251,7 @@ def evaluate_generation_token(model, val_loader, device):
             total_correct += correct
             total_samples += total
 
-            # model.eval()
-            # Generation-level评估
+            # Generation-level evaluation
             gen_results = model.evaluate_model(
                 samples=batch,
                 speech_input=raw_wav,
