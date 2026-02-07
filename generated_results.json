@@ -1,0 +1,12 @@
+[
+    {
+        "prediction": "joy",
+        "ground_truth": "sadness",
+        "match": false
+    },
+    {
+        "prediction": "joy",
+        "ground_truth": "sadness",
+        "match": false
+    }
+]
