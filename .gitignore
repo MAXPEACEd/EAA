@@ -32,3 +32,11 @@ checkpoints/
 envs/
 .conda/
 
+# local analysis artifacts
+attention_mechanisms_single_column.png
+change.py
+data_adjust.py
+draw.py
+generated_results.json
+meld_eval.jsonl
+
