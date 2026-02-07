@@ -32,6 +32,9 @@ checkpoints/
 envs/
 .conda/
 
+# local datasets
+data/
+
 # local analysis artifacts
 attention_mechanisms_single_column.png
 change.py
